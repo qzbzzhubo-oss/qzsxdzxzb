@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>九年级英语单词学习 - 人教版全一册</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        .word-card {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .word-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .pronunciation-btn {
+            transition: all 0.2s ease;
+        }
+        .pronunciation-btn:hover {
+            transform: scale(1.1);
+        }
+        .pronunciation-btn:active {
+            transform: scale(0.95);
+        }
+        .mastered {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        .favorite {
+            color: #f59e0b;
+        }
+        .search-container {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            transition: width 0.5s ease;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            transform: translateY(-2px);
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            .word-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .word-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.25rem;
+            }
+        }
+        .floating-action {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 50;
+        }
+        .test-modal {
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-book text-blue-600 text-xl"></i>
+                        <h1 class="text-xl font-bold text-gray-900">九年级英语单词</h1>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="nav-link text-blue-600 font-medium">
+                        <i class="fas fa-home mr-1"></i>单词学习
+                    </a>
+                    <a href="test.html" class="nav-link text-gray-600 hover:text-blue-600 font-medium">
+                        <i class="fas fa-vial mr-1"></i>单词测试
+                    </a>
+                    <a href="favorites.html" class="nav-link text-gray-600 hover:text-blue-600 font-medium">
+                        <i class="fas fa-star mr-1"></i>我的收藏
+                    </a>
+                    <a href="progress.html" class="nav-link text-gray-600 hover:text-blue-600 font-medium">
+                        <i class="fas fa-chart-line mr-1"></i>学习进度
+                    </a>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-blue-600">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
+            <div class="px-4 py-2 space-y-2">
+                <a href="index.html" class="block px-3 py-2 text-blue-600 font-medium">
+                    <i class="fas fa-home mr-2"></i>单词学习
+                </a>
+                <a href="test.html" class="block px-3 py-2 text-gray-600 hover:text-blue-600 font-medium">
+                    <i class="fas fa-vial mr-2"></i>单词测试
+                </a>
+                <a href="favorites.html" class="block px-3 py-2 text-gray-600 hover:text-blue-600 font-medium">
+                    <i class="fas fa-star mr-2"></i>我的收藏
+                </a>
+                <a href="progress.html" class="block px-3 py-2 text-gray-600 hover:text-blue-600 font-medium">
+                    <i class="fas fa-chart-line mr-2"></i>学习进度
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 搜索和筛选区域 -->
+    <div class="search-container fixed top-16 left-0 right-0 z-30 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col lg:flex-row gap-4 items-center">
+                <!-- 搜索框 -->
+                <div class="flex-1 w-full lg:w-auto">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            placeholder="搜索英文或中文..." 
+                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        >
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                </div>
+                
+                <!-- 筛选器 -->
+                <div class="flex flex-wrap gap-3">
+                    <select id="unit-filter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">所有单元</option>
+                        <option value="0">综合词汇</option>
+                        <option value="1">Unit 1</option>
+                        <option value="2">Unit 2</option>
+                        <option value="3">Unit 3</option>
+                        <option value="4">Unit 4</option>
+                        <option value="5">Unit 5</option>
+                        <option value="6">Unit 6</option>
+                        <option value="7">Unit 7</option>
+                        <option value="8">Unit 8</option>
+                        <option value="9">Unit 9</option>
+                        <option value="10">Unit 10</option>
+                        <option value="11">Unit 11</option>
+                        <option value="12">Unit 12</option>
+                        <option value="13">Unit 13</option>
+                        <option value="14">Unit 14</option>
+                    </select>
+                    
+                    <select id="category-filter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">所有分类</option>
+                        <option value="基础词">基础词</option>
+                        <option value="高频词">高频词</option>
+                        <option value="口语词">口语词</option>
+                        <option value="学科词">学科词</option>
+                        <option value="节日词">节日词</option>
+                        <option value="性格词">性格词</option>
+                        <option value="科技词">科技词</option>
+                    </select>
+                    
+                    <select id="difficulty-filter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">所有难度</option>
+                        <option value="easy">简单</option>
+                        <option value="medium">中等</option>
+                        <option value="hard">困难</option>
+                    </select>
+                    
+                    <button id="reset-filters" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200">
+                        <i class="fas fa-refresh mr-1"></i>重置
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 学习进度 -->
+            <div class="mt-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium text-gray-700">学习进度</span>
+                    <span id="progress-text" class="text-sm text-gray-500">0/300 已掌握</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div id="progress-bar" class="progress-bar h-2 rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <main class="pt-48 pb-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- 统计信息 -->
+            <div class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-white/80 backdrop-blur-sm rounded-lg p-6 text-center shadow-lg">
+                    <div class="text-3xl font-bold text-blue-600" id="total-words">300</div>
+                    <div class="text-gray-600">总词汇量</div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm rounded-lg p-6 text-center shadow-lg">
+                    <div class="text-3xl font-bold text-green-600" id="mastered-words">0</div>
+                    <div class="text-gray-600">已掌握</div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm rounded-lg p-6 text-center shadow-lg">
+                    <div class="text-3xl font-bold text-yellow-600" id="favorite-words">0</div>
+                    <div class="text-gray-600">收藏的</div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm rounded-lg p-6 text-center shadow-lg">
+                    <div class="text-3xl font-bold text-purple-600" id="today-words">0</div>
+                    <div class="text-gray-600">今日学习</div>
+                </div>
+            </div>
+
+            <!-- 单词网格 -->
+            <div id="words-container" class="word-grid mb-8">
+                <!-- 单词卡片将通过JavaScript动态生成 -->
+            </div>
+
+            <!-- 分页控件 -->
+            <div class="flex justify-center items-center space-x-2 mt-8">
+                <button id="prev-page" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div id="page-numbers" class="flex space-x-2">
+                    <!-- 页码将通过JavaScript动态生成 -->
+                </div>
+                <button id="next-page" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 浮动测试按钮 -->
+    <div class="floating-action">
+        <button id="quick-test-btn" class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110">
+            <i class="fas fa-vial text-xl"></i>
+        </button>
+    </div>
+
+    <!-- 测试模态框 -->
+    <div id="test-modal" class="fixed inset-0 z-50 hidden test-modal">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">快速测试</h3>
+                    <p class="text-gray-600">选择测试模式开始练习</p>
+                </div>
+                <div class="space-y-4">
+                    <button id="choice-test-btn" class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                        <i class="fas fa-list mr-2"></i>选择题测试
+                    </button>
+                    <button id="spell-test-btn" class="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200">
+                        <i class="fas fa-keyboard mr-2"></i>拼写测试
+                    </button>
+                    <button id="close-test-modal" class="w-full px-4 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200">
+                        <i class="fas fa-times mr-2"></i>取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-white/80 backdrop-blur-sm border-t border-gray-200 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-600">&copy; 2024 九年级英语单词学习系统. 人教版全一册高频考词.</p>
+        </div>
+    </footer>
+
+    <!-- 加载单词数据 -->
+    <script src="words-data.js"></script>
+    <!-- 主要JavaScript文件 -->
+    <script src="main.js"></script>
+</body>
+</html>

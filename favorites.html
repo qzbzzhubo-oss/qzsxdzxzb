@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的收藏 - 九年级英语单词学习</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        .word-card {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .word-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .pronunciation-btn {
+            transition: all 0.2s ease;
+        }
+        .pronunciation-btn:hover {
+            transform: scale(1.1);
+        }
+        .pronunciation-btn:active {
+            transform: scale(0.95);
+        }
+        .mastered {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        .favorite {
+            color: #f59e0b;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            transform: translateY(-2px);
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            .word-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .word-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.25rem;
+            }
+        }
+        .empty-state {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-book text-blue-600 text-xl"></i>
+                        <h1 class="text-xl font-bold text-gray-900">我的收藏</h1>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="nav-link text-gray-600 hover:text-blue-600 font-medium">
+                        <i class="fas fa-home mr-1"></i>单词学习
+                    </a>
+                    <a href="test.html" class="nav-link text-gray-600 hover:text-blue-600 font-medium">
+                        <i class="fas fa-vial mr-1"></i>单词测试
+                    </a>
+                    <a href="favorites.html" class="nav-link text-blue-600 font-medium">
+                        <i class="fas fa-star mr-1"></i>我的收藏
+                    </a>
+                    <a href="progress.html" class="nav-link text-gray-600 hover:text-blue-600 font-medium">
+                        <i class="fas fa-chart-line mr-1"></i>学习进度
+                    </a>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-blue-600">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
+            <div class="px-4 py-2 space-y-2">
+                <a href="index.html" class="block px-3 py-2 text-gray-600 hover:text-blue-600 font-medium">
+                    <i class="fas fa-home mr-2"></i>单词学习
+                </a>
+                <a href="test.html" class="block px-3 py-2 text-gray-600 hover:text-blue-600 font-medium">
+                    <i class="fas fa-vial mr-2"></i>单词测试
+                </a>
+                <a href="favorites.html" class="block px-3 py-2 text-blue-600 font-medium">
+                    <i class="fas fa-star mr-2"></i>我的收藏
+                </a>
+                <a href="progress.html" class="block px-3 py-2 text-gray-600 hover:text-blue-600 font-medium">
+                    <i class="fas fa-chart-line mr-2"></i>学习进度
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <main class="pt-24 pb-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- 页面标题和统计 -->
+            <div class="text-center mb-12">
+                <div class="flex items-center justify-center space-x-3 mb-4">
+                    <i class="fas fa-star text-4xl text-yellow-500"></i>
+                    <h2 class="text-3xl font-bold text-gray-900">我的收藏</h2>
+                </div>
+                <p class="text-gray-600 text-lg">收藏你觉得重要或难记的单词，重点复习</p>
+            </div>
+
+            <!-- 统计信息 -->
+            <div class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-white/80 backdrop-blur-sm rounded-lg p-6 text-center shadow-lg">
+                    <div class="text-3xl font-bold text-yellow-600" id="total-favorites">0</div>
+                    <div class="text-gray-600">收藏总数</div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm rounded-lg p-6 text-center shadow-lg">
+                    <div class="text-3xl font-bold text-green-600" id="mastered-favorites">0</div>
+                    <div class="text-gray-600">已掌握</div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm rounded-lg p-6 text-center shadow-lg">
+                    <div class="text-3xl font-bold text-blue-600" id="not-mastered-favorites">0</div>
+                    <div class="text-gray-600">待复习</div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm rounded-lg p-6 text-center shadow-lg">
+                    <div class="text-3xl font-bold text-purple-600" id="favorite-progress">0%</div>
+                    <div class="text-gray-600">掌握进度</div>
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="mb-8 flex flex-wrap justify-center gap-4">
+                <button id="test-favorites-btn" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    <i class="fas fa-vial mr-2"></i>测试收藏单词
+                </button>
+                <button id="clear-favorites-btn" class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200">
+                    <i class="fas fa-trash mr-2"></i>清空收藏
+                </button>
+                <button id="export-favorites-btn" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200">
+                    <i class="fas fa-download mr-2"></i>导出收藏
+                </button>
+            </div>
+
+            <!-- 搜索框 -->
+            <div class="mb-8">
+                <div class="relative max-w-md mx-auto">
+                    <input 
+                        type="text" 
+                        id="search-favorites" 
+                        placeholder="在收藏中搜索..." 
+                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
+                    >
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+
+            <!-- 单词网格 -->
+            <div id="favorites-container" class="word-grid">
+                <!-- 收藏的单词将通过JavaScript动态生成 -->
+            </div>
+
+            <!-- 空状态 -->
+            <div id="empty-state" class="hidden text-center py-16">
+                <div class="empty-state rounded-xl p-12 max-w-md mx-auto">
+                    <i class="fas fa-star text-6xl text-gray-300 mb-6"></i>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">还没有收藏任何单词</h3>
+                    <p class="text-gray-600 mb-8">在学习页面点击星星图标来收藏你觉得重要的单词</p>
+                    <a href="index.html" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                        <i class="fas fa-book mr-2"></i>开始学习
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 确认对话框 -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                <div class="text-center mb-6">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">确认清空收藏</h3>
+                    <p class="text-gray-600">这将删除所有收藏的单词，此操作无法撤销。</p>
+                </div>
+                <div class="flex space-x-4">
+                    <button id="confirm-clear" class="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200">
+                        确认清空
+                    </button>
+                    <button id="cancel-clear" class="flex-1 px-4 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-white/80 backdrop-blur-sm border-t border-gray-200 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-600">&copy; 2024 九年级英语单词学习系统. 人教版全一册高频考词.</p>
+        </div>
+    </footer>
+
+    <!-- 加载单词数据 -->
+    <script src="words-data.js"></script>
+    <!-- 收藏页面JavaScript -->
+    <script src="favorites.js"></script>
+</body>
+</html>
